@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import Admin from "../models/admin.models";
-import jwt from "jsonwebtoken";
 import MemberCode from "../models/membercode.models";
 import { generateToken } from "../utils/token_generator.utils";
 
