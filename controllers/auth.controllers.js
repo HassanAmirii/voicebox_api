@@ -5,8 +5,17 @@ import jwt from "jsonwebtoken";
 import MemberCode from "../models/membercode.models";
 import { generateToken } from "../utils/token_generator.utils";
 
+import {
+  validateRegisterSchema,
+  validateLoginSchema,
+} from "../validators/auth.validators";
+
 export const register = async (req, res, next) => {
   try {
+    const { error } = (validateRegisterSchema.validate = req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
     const { username, password, membershipCode } = req.body;
 
     const alreadyExist = await Admin.findOne({ username });
@@ -48,6 +57,11 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
+    const { error } = (validateLoginSchema.validate = req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
     const { username, password } = req.body;
     const admin = await Admin.findOne({ username }).select("+password");
 
