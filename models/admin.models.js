@@ -18,7 +18,6 @@ const adminSchema = new mongoose.Schema(
     },
 
     membershipCode: {
-      select: false,
       type: String,
       required: true,
       minlength: 10,
