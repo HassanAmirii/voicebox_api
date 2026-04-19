@@ -1,4 +1,6 @@
 import Report from "../models/report.models";
+import stats from "../services/stats.services";
+import Admin from "../models/admin.models";
 export const getReport = async (req, res, next) => {
   try {
     const { status, tags, search, page = 1, limit = 10 } = req.body;
@@ -55,6 +57,46 @@ export const patchReport = async (req, res, next) => {
       message: status
         ? `report successfully updated to ${status} `
         : "report note successfully updated",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getStats = async (req, res, next) => {
+  try {
+    const { totalReports, totalThisWeek, totalToday, handledRatio } =
+      await stats();
+    return res.status(200).json({
+      success: true,
+      data: { totalReports, totalThisWeek, totalToday, handledRatio },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAllAdmins = async (req, res, next) => {
+  try {
+    const admins = await Admin.find({}).select("username -_id");
+    res.status(200).json({
+      success: true,
+      data: admins, // [{ username: "admin" }, { username: "case_manager" }, ...]
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const removeAdmin = async (req, res, next) => {
+  try {
+    const { username } = req.params;
+
+    await Admin.findOneAndDelete({ username });
+
+    res.status(200).json({
+      success: true,
+      message: `${username} removed`,
     });
   } catch (error) {
     next(error);
