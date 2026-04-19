@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: ping server
         run: |
-          curl https://cbt-platform-api.onrender.com/health \
+          curl https://voicebox-api-zmw2.onrender.com/health \
           --fail \
           --silent \
           --show-error
