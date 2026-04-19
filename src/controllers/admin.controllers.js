@@ -8,6 +8,11 @@ export const getReport = async (req, res, next) => {
   try {
     const { status, tags, search, page = 1, limit = 10 } = req.query;
     const query = {};
+    const parsedPage = Math.max(1, Number.parseInt(page, 10) || 1);
+    const parsedLimit = Math.min(
+      Math.max(1, Number.parseInt(limit, 10) || 10),
+      100,
+    );
 
     if (status) query.status = status;
     if (tags) {
@@ -22,8 +27,8 @@ export const getReport = async (req, res, next) => {
     const [reports, totalReports] = await Promise.all([
       Report.find(query)
         .sort({ createdAt: -1 })
-        .skip((page - 1) * Number(limit))
-        .limit(Number(limit)),
+        .skip((parsedPage - 1) * parsedLimit)
+        .limit(parsedLimit),
       Report.countDocuments(query),
     ]);
 
@@ -31,10 +36,10 @@ export const getReport = async (req, res, next) => {
       success: true,
       reports,
       pagination: {
-        currentPage: page,
-        totalPages: Math.ceil(totalReports / limit),
+        currentPage: parsedPage,
+        totalPages: Math.ceil(totalReports / parsedLimit),
         totalReports,
-        limit,
+        limit: parsedLimit,
       },
     });
   } catch (error) {
@@ -50,6 +55,14 @@ export const patchReport = async (req, res, next) => {
     const updateData = {};
     if (status) updateData.status = status;
     if (adminNote) updateData.adminNote = adminNote;
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "at least one of status or adminNote is required",
+      });
+    }
+
     const report = await Report.findOneAndUpdate({ _id: id }, updateData, {
       new: true,
       runValidators: true,
@@ -99,7 +112,13 @@ export const deleteAdmin = async (req, res, next) => {
   try {
     const { username } = req.params;
 
-    await Admin.findOneAndDelete({ username });
+    const deletedAdmin = await Admin.findOneAndDelete({ username });
+    if (!deletedAdmin) {
+      return res.status(404).json({
+        success: false,
+        message: "admin not found",
+      });
+    }
 
     res.status(200).json({
       success: true,
@@ -112,6 +131,13 @@ export const deleteAdmin = async (req, res, next) => {
 
 export const getMembershipCode = async (req, res, next) => {
   try {
+    if (!req.user?.id) {
+      return res.status(401).json({
+        success: false,
+        message: "unauthorized",
+      });
+    }
+
     const membershipCode = generateStrings(10);
     const newCode = await MemberCode.create({
       code: membershipCode,

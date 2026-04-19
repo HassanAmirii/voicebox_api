@@ -5,7 +5,7 @@ const reportSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
-      minlength: [20, "Title must be at least 10 characters long"],
+      minlength: [20, "Title must be at least 20 characters long"],
       maxlength: [
         30,
         "limit title to 30 characters, you can espress more in comment section",
@@ -65,15 +65,15 @@ const reportSchema = new mongoose.Schema(
     adminNote: {
       type: String,
       validate: {
-        Validator: function (v) {
+        validator: function (v) {
           if (this.status === "Handled" || this.status === "Queue") {
             return typeof v === "string" && v.trim().length > 10;
           }
           return true;
         },
+        message:
+          "An admin note of at least 10 characters is required when updating status.",
       },
-      message:
-        "An admin note of at least 10 characters is required when updating status.",
     },
   },
   { timestamps: true },

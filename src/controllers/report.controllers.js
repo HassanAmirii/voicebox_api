@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import Report from "../models/report.models.js";
 import { validateCreateReport } from "../validators/report.validators.js";
 export const createReport = async (req, res, next) => {
@@ -23,8 +22,8 @@ export const createReport = async (req, res, next) => {
 
 export const getAllReports = async (req, res, next) => {
   try {
-    const page = Math.max(1, parseInt(req.query.page) || 1);
-    const limit = Math.min(parseInt(req.query.limit) || 10, 100);
+    const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(Number.parseInt(req.query.limit, 10) || 10, 100);
     const skip = (page - 1) * limit;
 
     const [reports, totalReports] = await Promise.all([

@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import Admin from "../models/admin.models.js";
 import MemberCode from "../models/membercode.models.js";
@@ -25,11 +24,14 @@ export const register = async (req, res, next) => {
       });
     }
 
-    const invitation = await MemberCode.findOne({ code: membershipCode });
+    const invitation = await MemberCode.findOne({
+      code: membershipCode,
+      expiresAt: { $gt: new Date() },
+    });
     if (!invitation || invitation.isUsed === true) {
       return res.status(400).json({
         success: false,
-        message: "invalid memebership code, consult admin",
+        message: "invalid or expired membership code, consult admin",
       });
     }
     const newAdmin = await Admin.create({

@@ -2,7 +2,7 @@ import Joi from "joi";
 
 export const validateCreateReport = Joi.object({
   title: Joi.string().min(20).max(30).required().messages({
-    "string.min": "Title must be at least 10 characters long",
+    "string.min": "Title must be at least 20 characters long",
     "string.max":
       "limit title to 30 characters, you can espress more in comment section",
   }),

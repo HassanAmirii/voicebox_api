@@ -39,7 +39,7 @@ const stats = async (req, res, next) => {
         totalReports === 0 ? 0 : (handledCount / totalReports) * 100,
     };
   } catch (error) {
-    next(error);
+    throw error;
   }
 };
 
