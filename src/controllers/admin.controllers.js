@@ -33,3 +33,30 @@ export const getReport = async (req, res, next) => {
     next(error);
   }
 };
+
+export const patchReport = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status, adminNote } = req.body;
+
+    const updateData = {};
+    if (status) updateData.status = status;
+    if (adminNote) updateData.adminNote = adminNote;
+    const report = await Result.findOneAndUpdate({ _id: id }, updateData, {
+      runValidators: true,
+    });
+
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: status
+        ? `report successfully updated to ${status} `
+        : "report note successfully updated",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
