@@ -1,6 +1,9 @@
 import Report from "../models/report.models";
 import stats from "../services/stats.services";
 import Admin from "../models/admin.models";
+import MemberCode from "../models/membercode.models";
+import { generateStrings } from "../utils/str_generator.utils";
+
 export const getReport = async (req, res, next) => {
   try {
     const { status, tags, search, page = 1, limit = 10 } = req.body;
@@ -88,7 +91,7 @@ export const getAllAdmins = async (req, res, next) => {
   }
 };
 
-export const removeAdmin = async (req, res, next) => {
+export const deleteAdmin = async (req, res, next) => {
   try {
     const { username } = req.params;
 
@@ -98,6 +101,19 @@ export const removeAdmin = async (req, res, next) => {
       success: true,
       message: `${username} removed`,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMembershipCode = async (req, res, next) => {
+  try {
+    const membershipCode = generateStrings(10);
+    const newCode = await MemberCode.create({
+      code: membershipCode,
+    });
+
+    return res.status(201).json({ success: true, code: newCode });
   } catch (error) {
     next(error);
   }
