@@ -12,6 +12,13 @@ const options = {
 //  exponential back off
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function connectWithRetry() {
+  if (!process.env.MONGO_URI) {
+    console.error(
+      "MONGO_URI is missing. Set it in your deployment environment.",
+    );
+    process.exit(1);
+  }
+
   let delay = 1000;
   for (let retry = 0; retry < 5; retry++) {
     try {
