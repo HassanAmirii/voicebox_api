@@ -144,7 +144,7 @@ export const getMembershipCode = async (req, res, next) => {
       generatedBy: req.user?.id,
     });
 
-    return res.status(201).json({ success: true, code: newCode });
+    return res.status(201).json({ success: true, code: newCode.code });
   } catch (error) {
     next(error);
   }
