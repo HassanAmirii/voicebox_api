@@ -1,17 +1,17 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import Admin from "../models/admin.models";
-import MemberCode from "../models/membercode.models";
-import { generateToken } from "../utils/token_generator.utils";
+import Admin from "../models/admin.models.js";
+import MemberCode from "../models/membercode.models.js";
+import { generateToken } from "../utils/token_generator.utils.js";
 
 import {
   validateRegisterSchema,
   validateLoginSchema,
-} from "../validators/auth.validators";
+} from "../validators/auth.validators.js";
 
 export const register = async (req, res, next) => {
   try {
-    const { error } = (validateRegisterSchema.validate = req.body);
+    const { error } = validateRegisterSchema.validate(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
@@ -25,7 +25,7 @@ export const register = async (req, res, next) => {
       });
     }
 
-    const invitation = await MemberCode.findOne({ membershipCode });
+    const invitation = await MemberCode.findOne({ code: membershipCode });
     if (!invitation || invitation.isUsed === true) {
       return res.status(400).json({
         success: false,
@@ -56,7 +56,7 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
-    const { error } = (validateLoginSchema.validate = req.body);
+    const { error } = validateLoginSchema.validate(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }

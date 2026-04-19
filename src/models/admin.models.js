@@ -24,7 +24,7 @@ const adminSchema = new mongoose.Schema(
       maxlength: 10,
     },
   },
-  { timestamps },
+  { timestamps: true },
 );
 
 adminSchema.pre("save", async function (next) {

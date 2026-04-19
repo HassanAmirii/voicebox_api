@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "start": "node --watch src/server.js"
+  },
   "name": "voicebox_api",
   "version": "1.0.0",
   "type": "module",

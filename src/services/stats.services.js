@@ -1,6 +1,6 @@
-import Report from "../models/report.models";
+import Report from "../models/report.models.js";
 
-export const stats = async (req, res, next) => {
+const stats = async (req, res, next) => {
   try {
     const now = new Date();
 
@@ -31,16 +31,16 @@ export const stats = async (req, res, next) => {
         }),
       ]);
 
-    return res.status(200).json({
-      success: true,
-      data: {
-        totalReports,
-        totalThisWeek,
-        totalToday,
-        handledRatio: (handledCount / totalReports) * 100,
-      },
-    });
+    return {
+      totalReports,
+      totalThisWeek,
+      totalToday,
+      handledRatio:
+        totalReports === 0 ? 0 : (handledCount / totalReports) * 100,
+    };
   } catch (error) {
     next(error);
   }
 };
+
+export default stats;

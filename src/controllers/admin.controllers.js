@@ -1,27 +1,30 @@
-import Report from "../models/report.models";
-import stats from "../services/stats.services";
-import Admin from "../models/admin.models";
-import MemberCode from "../models/membercode.models";
-import { generateStrings } from "../utils/str_generator.utils";
+import Report from "../models/report.models.js";
+import stats from "../services/stats.services.js";
+import Admin from "../models/admin.models.js";
+import MemberCode from "../models/membercode.models.js";
+import { generateStrings } from "../utils/str_generator.utils.js";
 
 export const getReport = async (req, res, next) => {
   try {
-    const { status, tags, search, page = 1, limit = 10 } = req.body;
+    const { status, tags, search, page = 1, limit = 10 } = req.query;
     const query = {};
 
     if (status) query.status = status;
-    if (tags) query.tags = tags;
+    if (tags) {
+      query.tags = Array.isArray(tags) ? tags : String(tags).split(",");
+    }
     if (search)
       query.$or = [
-        { title: { $regex: search, $option: "i" } },
-        { text: { $regex: search, $option: "i" } },
+        { title: { $regex: search, $options: "i" } },
+        { comment: { $regex: search, $options: "i" } },
       ];
 
     const [reports, totalReports] = await Promise.all([
-      (Report.find(query)
-        .skip((page - 1) * 10)
+      Report.find(query)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * Number(limit))
         .limit(Number(limit)),
-      Report.countDocument(query)),
+      Report.countDocuments(query),
     ]);
 
     res.status(200).json({
@@ -47,7 +50,8 @@ export const patchReport = async (req, res, next) => {
     const updateData = {};
     if (status) updateData.status = status;
     if (adminNote) updateData.adminNote = adminNote;
-    const report = await Result.findOneAndUpdate({ _id: id }, updateData, {
+    const report = await Report.findOneAndUpdate({ _id: id }, updateData, {
+      new: true,
       runValidators: true,
     });
 
@@ -111,6 +115,7 @@ export const getMembershipCode = async (req, res, next) => {
     const membershipCode = generateStrings(10);
     const newCode = await MemberCode.create({
       code: membershipCode,
+      generatedBy: req.user?.id,
     });
 
     return res.status(201).json({ success: true, code: newCode });

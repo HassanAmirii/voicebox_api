@@ -4,7 +4,7 @@ export const auth = async (req, res, next) => {
   try {
     const authHeader = req.headers["authorization"];
 
-    if (!authHeader?.startWith("Bearer")) {
+    if (!authHeader?.startsWith("Bearer ")) {
       return res.status(401).json({ success: false, message: "unauthorized" });
     }
     const token = authHeader.split(" ")[1];

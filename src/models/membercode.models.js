@@ -11,7 +11,7 @@ const memberCodeSchema = new mongoose.Schema(
     },
     generatedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Admin",
       required: true,
     },
     isUsed: {
