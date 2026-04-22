@@ -16,7 +16,6 @@ const adminSchema = new mongoose.Schema(
       required: true,
       minlength: 7,
     },
-
     membershipCode: {
       type: String,
       required: true,
@@ -26,7 +25,6 @@ const adminSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
-
 adminSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, 11);
