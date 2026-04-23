@@ -3,6 +3,8 @@ import stats from "../services/stats.services.js";
 import Admin from "../models/admin.models.js";
 import MemberCode from "../models/membercode.models.js";
 import { generateStrings } from "../utils/str_generator.utils.js";
+import NodeCache from "node-cache";
+const cache = new NodeCache({ stdTTL: 60 });
 
 export const getReport = async (req, res, next) => {
   try {
@@ -85,12 +87,17 @@ export const patchReport = async (req, res, next) => {
 
 export const getStats = async (req, res, next) => {
   try {
+    const cached = cache.get("report_stats");
+    if (cached) return res.status(200).json(cached);
     const { totalReports, totalThisWeek, totalToday, handledRatio } =
       await stats();
-    return res.status(200).json({
+    const response = {
       success: true,
       data: { totalReports, totalThisWeek, totalToday, handledRatio },
-    });
+    };
+
+    cache.set("report_stats", response);
+    return res.status(200).json(response);
   } catch (error) {
     next(error);
   }

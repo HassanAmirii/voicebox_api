@@ -9,6 +9,8 @@ Express + MongoDB backend for anonymous incident reports and admin moderation.
 - MongoDB + Mongoose
 - Joi validation
 - JWT auth
+- CORS + Helmet + mongo sanitize
+- NodeCache (admin stats caching)
 
 ## Environment Variables
 
@@ -22,11 +24,28 @@ APP_ENV=development
 FRONTEND_URL=http://localhost:5173
 ```
 
+Notes:
+
+- Required to boot: `MONGO_URI`, `JWT_SECRET`
+- `PORT` defaults to `3000` if missing
+- `FRONTEND_URL` is used as production CORS origin
+
 ## Install and Run
 
 ```bash
 npm install
+```
+
+Start production mode:
+
+```bash
 npm start
+```
+
+Start in watch mode:
+
+```bash
+npm run dev
 ```
 
 Health check:
@@ -43,7 +62,12 @@ Protected endpoints require:
 Authorization: Bearer <jwt-token>
 ```
 
-Token is returned from `POST /auth/login` and `POST /auth/register`.
+Tokens are returned by:
+
+- `POST /auth/register`
+- `POST /auth/login`
+
+Token expiry is `1d`.
 
 ## Rate Limiting
 
@@ -62,16 +86,22 @@ When a limit is exceeded, the API responds with:
 }
 ```
 
+## Security Middleware
+
+- `express-mongo-sanitize`: strips mongo operators from payloads
+- `helmet`: secures common HTTP response headers
+- `cors`: allows configured frontend origins and auth headers
+
 ## Data Models (Summary)
 
 ### Report
 
-- `title` (string, 20-30 chars, required)
-- `tags` (array, required, at least one from allowed list)
-- `identity` (string, optional, min 15 chars if provided, stored as hidden field)
-- `comment` (string, required, min 150 chars)
+- `title` (string, required, min 20, max 30)
+- `tags` (array of allowed values, required, at least one)
+- `identity` (string, optional, min 15 if provided, hidden by default)
+- `comment` (string, required, min 150)
 - `status` (`Unhandled` | `Queue` | `Handled`, default `Unhandled`)
-- `adminNote` (string, required to be >10 chars when status is `Queue` or `Handled`)
+- `adminNote` (required and > 10 chars when status is `Queue` or `Handled`)
 
 ### Admin
 
@@ -84,13 +114,13 @@ When a limit is exceeded, the API responds with:
 - `code` (string, unique, 10 chars)
 - `generatedBy` (admin id)
 - `isUsed` (boolean)
-- `expiresAt` (auto expires in 1 hour)
+- `expiresAt` (auto expires in 1 hour via TTL index)
 
 ## API Endpoints
 
 Base URL examples use `http://localhost:3000`.
 
-### Public
+### Public Endpoints
 
 #### 1) Submit report
 
@@ -163,8 +193,9 @@ Body:
 
 Notes:
 
-- Membership code must exist, be unused, and be unexpired.
-- On success, the code becomes used.
+- Membership code must exist, be unused, and unexpired.
+- On success, the code is marked as used.
+- Response includes created admin data and a token.
 
 #### 4) Login admin
 
@@ -206,7 +237,7 @@ Authorization: Bearer <jwt>
 Query params:
 
 - `status`: `Unhandled` | `Queue` | `Handled`
-- `tags`: comma-separated tags
+- `tags`: comma-separated tags (or repeated query tags)
 - `search`: matches report `title` or `comment`
 - `page`: min 1
 - `limit`: 1-100
@@ -235,19 +266,7 @@ GET /admin/stats
 Authorization: Bearer <jwt>
 ```
 
-Success response:
-
-```json
-{
-  "success": true,
-  "data": {
-    "totalReports": 12,
-    "totalThisWeek": 4,
-    "totalToday": 1,
-    "handledRatio": 25
-  }
-}
-```
+Response is cached for 60 seconds.
 
 #### 8) List admins
 
@@ -255,6 +274,8 @@ Success response:
 GET /admin/admins
 Authorization: Bearer <jwt>
 ```
+
+Returns usernames only.
 
 #### 9) Delete admin by username
 
@@ -272,12 +293,19 @@ POST /admin/membership-code
 Authorization: Bearer <jwt>
 ```
 
-Success response contains generated code document and expires in 1 hour.
+Success response:
+
+```json
+{
+  "success": true,
+  "code": "A1B2C3D4E5"
+}
+```
 
 ## Error Behavior
 
 - Validation errors: `400`
-- Invalid credentials/token: `401`
+- Invalid or expired token: `401`
 - Not found: `404`
 - Duplicate unique values: `409`
 - Unexpected server errors: `500`

@@ -1,5 +1,6 @@
 import "dotenv/config";
 import mongoose from "mongoose";
+import { validateEnv } from "./configs/validateEnv.configs.js";
 import app from "./app.js";
 const port = process.env.PORT || 3000;
 const options = {
@@ -8,6 +9,8 @@ const options = {
   socketTimeoutMS: 30000,
   family: 4,
 };
+//validate env
+validateEnv();
 
 //  exponential back off
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
