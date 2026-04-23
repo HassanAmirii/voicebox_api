@@ -113,6 +113,23 @@ Authorization: Bearer <jwt-token>
 
 Token is returned from `POST /auth/login` and `POST /auth/register`.
 
+## Rate Limiting
+
+The API uses `express-rate-limit` on selected public write/auth routes.
+
+- `POST /auth/login`: 5 requests per 15 minutes per IP
+- `POST /auth/register`: 10 requests per 1 hour per IP
+- `POST /reports`: 20 requests per 1 hour per IP
+
+When a limit is exceeded, the API responds with:
+
+```json
+{
+  "success": false,
+  "message": "too many attempts, try again later"
+}
+```
+
 ## Data Models (Summary)
 
 ### Report
@@ -149,6 +166,8 @@ Base URL examples use `http://localhost:3000`.
 POST /reports
 Content-Type: application/json
 ```
+
+Rate limit: 20 requests per 1 hour per IP.
 
 Body:
 
@@ -198,6 +217,8 @@ POST /auth/register
 Content-Type: application/json
 ```
 
+Rate limit: 10 requests per 1 hour per IP.
+
 Body:
 
 ```json
@@ -219,6 +240,8 @@ Notes:
 POST /auth/login
 Content-Type: application/json
 ```
+
+Rate limit: 5 requests per 15 minutes per IP.
 
 Body:
 
