@@ -7,7 +7,7 @@ import {
   deleteAdmin,
   getMembershipCode,
 } from "../controllers/admin.controllers.js";
-import { auth } from "../middleware/auth.middleware.js";
+import { auth } from "../middlewares/auth.middlewares.js";
 
 const router = Router();
 
@@ -19,3 +19,4 @@ router.delete("/admins/:username", auth, deleteAdmin);
 router.post("/membership-code", auth, getMembershipCode);
 
 export default router;
+
