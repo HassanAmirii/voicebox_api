@@ -13,6 +13,9 @@ jobs:
       - name: ping server
         run: |
           curl https://voicebox-api-zmw2.onrender.com/health \
-          --fail \
+          --retry 3 \
+          --retry-delay 10 \
+          --retry-all-errors \
+          --max-time 60 \
           --silent \
           --show-error
