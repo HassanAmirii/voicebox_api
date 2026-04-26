@@ -1,10 +1,7 @@
 {
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js",
-    "bootstrap:admin": "node src/scripts/bootstrap-admin.js",
-    "bootstrap:interactive": "node src/scripts/bootstrap-interactive.js",
-    "seed:membership-code": "node src/scripts/seed-membership-code.js"
+    "dev": "node --watch src/server.js"
   },
   "name": "voicebox_api",
   "version": "1.0.0",
