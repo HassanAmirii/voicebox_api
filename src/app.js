@@ -8,9 +8,6 @@ import adminRoutes from "./routes/admin.routes.js";
 import reportRoutes from "./routes/report.routes.js";
 
 const app = express();
-app.use(express.json());
-app.use(mongoSanitize());
-app.use(helmet());
 /*
 cors setup
 */
@@ -36,6 +33,13 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
+
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  }),
+);
+app.use(express.json());
 
 /*
 health checks
