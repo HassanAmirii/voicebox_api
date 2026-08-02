@@ -6,7 +6,7 @@ export const validateCreateReport = Joi.object({
     "string.max":
       "limit title to 30 characters, you can espress more in comment section",
   }),
-  identity: Joi.string().min(15).messages({
+  identity: Joi.string().min(15).optional().allow("", null).messages({
     "string.min": "please provide enough data to best figure out your identity",
   }),
   comment: Joi.string().min(150).required().messages({
