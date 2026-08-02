@@ -2,7 +2,7 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import { validateEnv } from "./configs/validateEnv.configs.js";
 import app from "./app.js";
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 const options = {
   autoIndex: false,
   connectTimeoutMS: 10000,
