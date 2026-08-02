@@ -41,10 +41,6 @@ const reportSchema = new mongoose.Schema(
       select: false,
       default: "Anonymous",
       trim: true,
-      minlength: [
-        15,
-        "please provide enough data to best figure out your identity",
-      ],
     },
     comment: {
       type: String,
