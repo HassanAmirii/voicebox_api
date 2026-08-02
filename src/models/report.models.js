@@ -6,10 +6,6 @@ const reportSchema = new mongoose.Schema(
       type: String,
       required: true,
       minlength: [20, "Title must be at least 20 characters long"],
-      maxlength: [
-        30,
-        "limit title to 30 characters, you can espress more in comment section",
-      ],
       trim: true,
     },
     tags: {
