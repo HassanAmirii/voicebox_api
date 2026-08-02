@@ -27,7 +27,9 @@ async function connectWithRetry() {
     try {
       await mongoose.connect(process.env.MONGO_URI, options);
       console.log("succesfully connected to the database");
-      app.listen(port, () => console.log(`Server running on port ${port}`));
+      app.listen(port, "0.0.0.0", () =>
+        console.log(`Server running on port ${port}`),
+      );
       return;
     } catch (error) {
       console.error("error connecting to the database:", error);
