@@ -156,3 +156,22 @@ export const getMembershipCode = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteReport = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const deletedReport = await Report.findByIdAndDelete(id);
+    if (!deletedReport) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Report deleted succesfully",
+      data: deletedReport,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
