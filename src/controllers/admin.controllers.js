@@ -28,6 +28,7 @@ export const getReport = async (req, res, next) => {
 
     const [reports, totalReports] = await Promise.all([
       Report.find(query)
+        .select("+identity")
         .sort({ createdAt: -1 })
         .skip((parsedPage - 1) * parsedLimit)
         .limit(parsedLimit),
