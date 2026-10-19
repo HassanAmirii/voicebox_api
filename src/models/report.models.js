@@ -57,7 +57,11 @@ const reportSchema = new mongoose.Schema(
       enum: ["Unhandled", "Queue", "Handled"],
       trim: true,
     },
-
+    ticketId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     adminNote: {
       type: String,
       validate: {

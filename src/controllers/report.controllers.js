@@ -1,4 +1,5 @@
 import Report from "../models/report.models.js";
+import { generateStrings } from "../utils/str_generator.utils.js";
 import { validateCreateReport } from "../validators/report.validators.js";
 export const createReport = async (req, res, next) => {
   try {
@@ -7,14 +8,17 @@ export const createReport = async (req, res, next) => {
       return res.status(400).json({ message: error.details[0].message });
     }
     const { title, tags, identity, comment } = req.body;
-    await Report.create({
+
+    const ticketId = generateStrings(10);
+    const newReport = new Report({
       title,
       tags,
       identity,
       comment,
+      ticketId,
     });
-
-    return res.status(201).json({ success: true, message: "report submitted" });
+    await newReport.save();
+    return res.status(201).json({ success: true, message: "report submitted", newReport });
   } catch (error) {
     next(error);
   }
@@ -43,6 +47,20 @@ export const getAllReports = async (req, res, next) => {
         limit,
       },
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const findReport = async(req, res, next )=> {
+
+  try {
+    const {ticketId} = req.params;
+    const getSingleReport = await Report.findOne({ticketId});
+    if (!getSingleReport) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+    return res.status(200).json({ success: true, report: getSingleReport });
   } catch (error) {
     next(error);
   }
