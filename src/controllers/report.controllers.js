@@ -18,7 +18,13 @@ export const createReport = async (req, res, next) => {
       ticketId,
     });
     await newReport.save();
-    return res.status(201).json({ success: true, message: "report submitted", newReport });
+    const report = newReport.toObject();
+    return res.status(201).json({
+      success: true,
+      message: "report submitted",
+      ticketId: report.ticketId,
+      newReport: report,
+    });
   } catch (error) {
     next(error);
   }
@@ -52,11 +58,10 @@ export const getAllReports = async (req, res, next) => {
   }
 };
 
-export const findReport = async(req, res, next )=> {
-
+export const findReport = async (req, res, next) => {
   try {
-    const {ticketId} = req.params;
-    const getSingleReport = await Report.findOne({ticketId});
+    const { ticketId } = req.params;
+    const getSingleReport = await Report.findOne({ ticketId });
     if (!getSingleReport) {
       return res.status(404).json({ message: "Report not found" });
     }

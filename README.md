@@ -147,9 +147,24 @@ Success response:
 ```json
 {
   "success": true,
-  "message": "report submitted"
+  "message": "report submitted",
+  "ticketId": "aB3xYz91Qw",
+  "newReport": {
+    "_id": "...",
+    "title": "This title has twenty chars",
+    "tags": ["Harassment"],
+    "comment": "At least 150 characters describing what happened, where it happened, who was involved, and any additional context that can help administrators review and respond quickly.",
+    "status": "Unhandled",
+    "ticketId": "aB3xYz91Qw",
+    "createdAt": "2026-10-20T00:00:00.000Z",
+    "updatedAt": "2026-10-20T00:00:00.000Z"
+  }
 }
 ```
+
+The generated ticket can be read from `response.ticketId` or
+`response.newReport.ticketId`. Use it to retrieve the report with
+`GET /reports/:ticketId`.
 
 #### 2) List submitted reports (public feed)
 
